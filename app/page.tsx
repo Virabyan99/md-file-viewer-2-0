@@ -25,7 +25,7 @@ export default function HomePage() {
     accept: { 'text/markdown': ['.md'] },
     multiple: false,
     maxFiles: 1,
-    disabled: !!fileName,
+    // Removed 'disabled: !!fileName' to keep dropzone always active
   });
 
   async function handleFile(file: File) {
@@ -63,9 +63,10 @@ export default function HomePage() {
 
   return (
     <main
-      {...(!fileName ? getRootProps() : {})}
+      {...getRootProps()} // Always apply dropzone props
       className="flex min-h-screen flex-col items-center justify-center px-4 py-16"
     >
+      {/* Only show input when no file is uploaded */}
       {!fileName && <input {...getInputProps()} />}
       <div className="w-full max-w-3xl">
         {!fileName ? (
@@ -117,6 +118,15 @@ export default function HomePage() {
                   Page {currentPage + 1} of {sections.length}
                 </div>
               </>
+            )}
+            {/* Show drag feedback even when a file is uploaded */}
+            {isDragActive && (
+              <p className="mt-2 text-sm text-gray-700">Drop your markdown file here...</p>
+            )}
+            {fileRejections.length > 0 && (
+              <p className="mt-2 text-sm text-red-600">
+                ❌ Invalid file type. Please drop a `.md` file.
+              </p>
             )}
           </div>
         )}
