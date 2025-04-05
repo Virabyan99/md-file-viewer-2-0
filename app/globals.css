@@ -112,6 +112,28 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+/* Shiki overrides */
+.shiki {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  background-color: #f9fafb; /* Matches github-light; adjust for other themes */
+}
+
+.shiki code {
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+button.copy-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Matches ring-blue-500 */
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

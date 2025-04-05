@@ -1,18 +1,37 @@
 import MarkdownIt from 'markdown-it';
 import DOMPurify from 'dompurify';
+import * as shiki from 'shiki';
 
-// Create the parser instance
-const md = new MarkdownIt({
-  html: true,          // Allow raw HTML in Markdown (sanitized later)
-  linkify: true,       // Auto-link URLs
-  typographer: true,   // Smart quotes and dashes
+// Load the highlighter once with themes and languages
+let highlighterPromise = shiki.createHighlighter({
+  themes: ['github-light'],
+  langs: ['javascript', 'typescript', 'html', 'css'],
 });
 
-// Convert raw Markdown to HTML, then sanitize it
-export function parseMarkdownToHtml(content: string): string {
-  const rawHtml = md.render(content);
-  const safeHtml = DOMPurify.sanitize(rawHtml, {
-    USE_PROFILES: { html: true }, // Enable basic safe HTML only
+export async function parseMarkdownToHtml(content: string): Promise<string> {
+  const highlighter = await highlighterPromise;
+
+  const md = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true,
+    highlight: (code: string, lang: string): string => {
+      try {
+        if (lang && highlighter.getLoadedLanguages().includes(lang)) {
+          return highlighter.codeToHtml(code, {
+            lang,
+            theme: 'github-light', // Use theme instead of themes
+          });
+        }
+      } catch {
+        // Fallback below
+      }
+      return `<pre><code>${md.utils.escapeHtml(code)}</code></pre>`;
+    },
   });
-  return safeHtml;
+
+  const rawHtml = md.render(content);
+  return DOMPurify.sanitize(rawHtml, {
+    USE_PROFILES: { html: true },
+  });
 }
