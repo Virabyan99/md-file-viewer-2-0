@@ -2,10 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async headers() {
-    // Check if in development mode
-    const isDev = process.env.NODE_ENV === "development";
-    // Conditionally include 'unsafe-eval' in development
-    const scriptSrc = isDev ? "'self' 'unsafe-inline' 'unsafe-eval'" : "'self' 'unsafe-inline'";
+    // Always include 'unsafe-eval' for WebAssembly support
+    const scriptSrc = "'self' 'unsafe-inline' 'unsafe-eval'";
 
     return [
       {
