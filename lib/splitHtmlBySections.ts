@@ -7,9 +7,8 @@ export function splitHtmlByH2Sections(html: string): string[] {
   
     Array.from(wrapper.children).forEach((node) => {
       if (node.tagName === 'H2') {
-        // Start a new section
         if (currentSection) {
-          sections.push(currentSection.innerHTML);
+          sections.push(currentSection!.innerHTML);
         }
         currentSection = document.createElement('div');
         currentSection.appendChild(node.cloneNode(true));
@@ -21,10 +20,9 @@ export function splitHtmlByH2Sections(html: string): string[] {
       }
     });
   
-    // Push the last section
     if (currentSection) {
-      sections.push(currentSection.innerHTML);
+      sections.push(currentSection!.innerHTML);
     }
   
     return sections;
-  }
+}
