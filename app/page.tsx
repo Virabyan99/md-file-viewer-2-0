@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import { parseMarkdownToHtml } from '@/lib/parseMarkdown';
 import { splitHtmlByH2Sections } from '@/lib/splitHtmlBySections';
-import { preprocessMarkdown } from '@/lib/preprocessMarkdown';
+import {  preprocessMarkdownWithLLM } from '@/lib/preprocessMarkdown';
 
 export default function HomePage() {
   const [sections, setSections] = useState<string[]>([]);
@@ -32,7 +32,7 @@ export default function HomePage() {
     setLoading(true);
     setFileName(file.name);
     const rawText = await file.text();
-    const cleanedText = preprocessMarkdown(rawText); // Preprocess the Markdown
+    const cleanedText = await preprocessMarkdownWithLLM(rawText); // Use LLM preprocessing
     const html = await parseMarkdownToHtml(cleanedText);
     const split = splitHtmlByH2Sections(html);
     setSections(split);
