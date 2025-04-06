@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { sha256 } from '@noble/hashes/sha256';
 
+export const runtime = 'edge';
+
 export async function POST(request: Request) {
   const { code } = await request.json();
 
