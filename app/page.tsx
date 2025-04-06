@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import { parseMarkdownToHtml } from '@/lib/parseMarkdown';
 import { splitHtmlByH2Sections } from '@/lib/splitHtmlBySections';
+import { preprocessMarkdown } from '@/lib/preprocessMarkdown';
 
 export default function HomePage() {
   const [sections, setSections] = useState<string[]>([]);
@@ -25,14 +26,14 @@ export default function HomePage() {
     accept: { 'text/markdown': ['.md'] },
     multiple: false,
     maxFiles: 1,
-    // Removed 'disabled: !!fileName' to keep dropzone always active
   });
 
   async function handleFile(file: File) {
     setLoading(true);
     setFileName(file.name);
-    const text = await file.text();
-    const html = await parseMarkdownToHtml(text);
+    const rawText = await file.text();
+    const cleanedText = preprocessMarkdown(rawText); // Preprocess the Markdown
+    const html = await parseMarkdownToHtml(cleanedText);
     const split = splitHtmlByH2Sections(html);
     setSections(split);
     setCurrentPage(0);
@@ -63,10 +64,9 @@ export default function HomePage() {
 
   return (
     <main
-      {...getRootProps()} // Always apply dropzone props
+      {...getRootProps()}
       className="flex min-h-screen flex-col items-center justify-center px-4 py-16"
     >
-      {/* Only show input when no file is uploaded */}
       {!fileName && <input {...getInputProps()} />}
       <div className="w-full max-w-3xl">
         {!fileName ? (
@@ -119,7 +119,6 @@ export default function HomePage() {
                 </div>
               </>
             )}
-            {/* Show drag feedback even when a file is uploaded */}
             {isDragActive && (
               <p className="mt-2 text-sm text-gray-700">Drop your markdown file here...</p>
             )}

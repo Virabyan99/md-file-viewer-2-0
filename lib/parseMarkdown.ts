@@ -20,13 +20,14 @@ export async function parseMarkdownToHtml(content: string): Promise<string> {
         if (lang && highlighter.getLoadedLanguages().includes(lang)) {
           return highlighter.codeToHtml(code, {
             lang,
-            theme: 'github-light', // Use theme instead of themes
+            theme: 'github-light',
           });
         }
       } catch {
         // Fallback below
       }
-      return `<pre><code>${md.utils.escapeHtml(code)}</code></pre>`;
+      // Updated fallback with shiki-fallback class
+      return `<pre class="shiki shiki-fallback"><code>${md.utils.escapeHtml(code)}</code></pre>`;
     },
   });
 

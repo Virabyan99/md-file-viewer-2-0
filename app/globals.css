@@ -129,6 +129,18 @@
   color: inherit;
 }
 
+/* Fallback styles for untagged code blocks */
+.shiki.shiki-fallback {
+  background-color: #f3f4f6; /* Tailwind gray-100 */
+  color: #111827;            /* Tailwind gray-900 */
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;       /* Tailwind text-sm */
+  line-height: 1.6;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
 button.copy-btn:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Matches ring-blue-500 */
