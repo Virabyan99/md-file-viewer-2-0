@@ -1,6 +1,24 @@
 import { detectLanguageWithAI } from './detectLanguageWithAI';
+import { useParserMode } from '@/store/parserMode';
 
 export async function preprocessMarkdownWithLLM(content: string): Promise<string> {
+  const mode = useParserMode.getState().mode;
+
+  if (mode === 'raw') {
+    return content; // Skip preprocessing
+  }
+
+  if (mode === 'strict') {
+    // Treat all untagged code as plain text
+    return content.replace(/```[\s\S]*?```/g, (match) => {
+      if (!match.startsWith('```') || match.startsWith('```\n')) {
+        return match.replace(/```(\w*)/, '```text');
+      }
+      return match; // Preserve tagged blocks
+    });
+  }
+
+  // Default 'auto' mode: use AI to detect languages
   const lines = content.split('\n');
   const wrapped: string[] = [];
   let buffer: string[] = [];
@@ -9,10 +27,8 @@ export async function preprocessMarkdownWithLLM(content: string): Promise<string
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Check if we're entering or exiting a fenced code block
     if (line.trim().startsWith('```')) {
       if (!insideBlock) {
-        // Process any buffered untagged code
         if (buffer.length >= 2) {
           const lang = await detectLanguageWithAI(buffer.join('\n'));
           wrapped.push(`\`\`\`${lang}`, ...buffer, '```');
@@ -21,18 +37,16 @@ export async function preprocessMarkdownWithLLM(content: string): Promise<string
         }
         buffer = [];
       }
-      wrapped.push(line); // Preserve the original fenced block
+      wrapped.push(line);
       insideBlock = !insideBlock;
       continue;
     }
 
-    // If inside a fenced block, just pass the line through
     if (insideBlock) {
       wrapped.push(line);
       continue;
     }
 
-    // Handle untagged code-like text
     if (line.trim() === '') {
       if (buffer.length >= 2) {
         const lang = await detectLanguageWithAI(buffer.join('\n'));
@@ -41,13 +55,12 @@ export async function preprocessMarkdownWithLLM(content: string): Promise<string
         wrapped.push(...buffer);
       }
       buffer = [];
-      wrapped.push(''); // Preserve blank lines
+      wrapped.push('');
     } else {
-      buffer.push(line); // Buffer potential code lines
+      buffer.push(line);
     }
   }
 
-  // Process any remaining buffered lines
   if (buffer.length >= 2) {
     const lang = await detectLanguageWithAI(buffer.join('\n'));
     wrapped.push(`\`\`\`${lang}`, ...buffer, '```');

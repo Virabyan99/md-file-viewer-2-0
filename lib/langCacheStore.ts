@@ -1,3 +1,4 @@
+// lib/langCacheStore.ts
 import { create } from 'zustand';
 import { db } from './langCacheDb';
 
@@ -23,6 +24,12 @@ export const useLangCache = create<LangCache>((set, get) => ({
   },
   set: async (hash, lang) => {
     set((state) => ({ memory: { ...state.memory, [hash]: lang } }));
-    await db.langMap.put({ hash, lang });
-  }
+    await db.langMap.put({ hash, lang, ts: Date.now() });
+  },
 }));
+
+// Cleanup function to remove entries older than 30 days
+export async function cleanupLangCache(daysOld: number = 30) {
+  const threshold = Date.now() - daysOld * 24 * 60 * 60 * 1000;
+  await db.langMap.where('ts').below(threshold).delete();
+}
