@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@noble/hashes": "^1.7.1",
     "@radix-ui/react-slot": "^1.1.2",
     "@tailwindcss/typography": "^0.5.16",
     "class-variance-authority": "^0.7.1",
+    "cloudflare-workers-kv": "^1.0.0",
     "clsx": "^2.1.1",
     "dompurify": "^3.2.5",
     "lucide-react": "^0.487.0",
