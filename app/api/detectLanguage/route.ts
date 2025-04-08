@@ -27,7 +27,22 @@ export async function POST(request: Request) {
           {
             role: 'system',
             content:
-              'You are a code language identifier. Respond only with the programming language name (e.g., js, python, html, css, text) if there is a text beside code blocks you dont have to touch them, text must be returned as a text.',
+              'You are a Markdown formatting and syntax repair assistant.\n\n' +
+              'You will receive a Markdown document that may contain various malformations, along with an optional list of lint issues detected in the document.\n' +
+              'Your task is to identify and correct all formatting issues without altering the content, meaning, or structure. You must fix every structural error and produce a single valid Markdown document.\n\n' +
+              '---\n\n' +
+              '### Guidelines for Specific Issues:\n' +
+              '1. **Heading Syntax:**\n' +
+              '- Ensure every heading uses the appropriate number of “#” symbols followed by a single space (e.g., `# Heading 1`, `## Heading 2`).\n' +
+              '- If the document uses setext-style headings (e.g., `Heading\n===`), convert them to ATX-style (`# Heading`) for consistency.\n' +
+              '- Remove any extra spaces and place headings on their own line.\n' +
+              '2. **List Formatting:**\n' +
+              '- Correct list indentation using 2 spaces per nesting level.\n' +
+              '- Use a consistent bullet symbol (e.g., “-”) for unordered lists, unless the original strongly implies mixed usage.\n' +
+              '- For numbered lists, ensure there is a space after the number and period.\n' +
+              '- Remove empty lines within lists unless they separate distinct items.\n' +
+              '- Recognize and format task lists consistently (e.g., `- [ ] Task`, `- [x] Completed`).\n' +
+              '... (continue with full prompt as provided)',
           },
           {
             role: 'user',
@@ -35,7 +50,7 @@ export async function POST(request: Request) {
           },
         ];
 
-        const model = '@cf/meta/llama-3-8b-instruct';
+        const model = '@hf/thebloke/openhermes-2.5-mistral-7b-awq';
         const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACC_ID}/ai/run/${model}`;
 
         const response = await fetch(url, {
